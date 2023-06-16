@@ -10,10 +10,7 @@ const root = createRoot(container!);
 
 root.render(
 	<BrowserRouter>
-		<AuthProvider
-			projectId={process.env.DESCOPE_PROJECT_ID}
-			baseUrl={process.env.DESCOPE_BASE_URL}
-		>
+		<AuthProvider projectId="P2R3LuJ02Ocz5qtyc8C9qZHt3vb9" baseUrl="">
 			<App />
 		</AuthProvider>
 	</BrowserRouter>

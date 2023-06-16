@@ -1,4 +1,5 @@
 /* eslint-disable import/prefer-default-export */
+import jwtDecode from 'jwt-decode';
 import { getSessionToken } from '../../src';
 
 // In this sample app, we just call an external public API
@@ -17,4 +18,10 @@ export const fetchData = async () => {
 	});
 	const data = await res.json();
 	return data?.text;
+};
+
+export const parseJwt = (token: string): Object => {
+	if (typeof token !== 'string' || !token)
+		throw new Error('Invalid token provided');
+	return jwtDecode(token);
 };

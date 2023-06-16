@@ -1,8 +1,8 @@
 import type { UserResponse } from '@descope/web-js-sdk';
 import React, { useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { getJwtRoles, useDescope, useSession, useUser } from '../../src';
-import { fetchData } from './api';
+import { useDescope, useSession, useUser } from '../../src';
+import { fetchData, parseJwt } from './api';
 
 const getUserDisplayName = (user?: UserResponse) =>
 	user?.name || user?.loginIds?.[0] || '';
@@ -20,9 +20,26 @@ const Home = () => {
 		const data = await fetchData();
 		alert(data); // eslint-disable-line no-alert
 	}, []);
-	const roles = useMemo(
-		() => sessionToken && JSON.stringify(getJwtRoles(sessionToken) || []),
+
+	const tenants = useMemo(
+		() => sessionToken && Object.keys(parseJwt(sessionToken).tenants),
 		[sessionToken]
+	);
+
+	const roles = useMemo(
+		() =>
+			tenants &&
+			tenants.map((tenant) => parseJwt(sessionToken).tenants[tenant].roles),
+		[tenants]
+	);
+
+	const permissions = useMemo(
+		() =>
+			tenants &&
+			tenants.map(
+				(tenant) => parseJwt(sessionToken).tenants[tenant].permissions
+			),
+		[tenants]
 	);
 
 	if (isSessionLoading) return <div>Loading...</div>;
@@ -37,7 +54,9 @@ const Home = () => {
 			{isAuthenticated && (
 				<>
 					<div className="username"> Hello {getUserDisplayName(user)}!</div>
-					<div className="username"> Roles: {roles}</div>
+					<div className="username"> Tenants: {tenants}</div>
+					<div className="username"> Roles: {roles.join()}</div>
+					<div className="username"> Permissions: {permissions.join()}</div>
 					<button
 						type="button"
 						id="logout-button"
